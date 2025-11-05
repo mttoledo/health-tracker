@@ -41,36 +41,67 @@ main {
     align-items: center;
     padding: 25px 0px;
     gap: 10px;
+}
 
-    h2 {
-        font-weight: 600;
-        font-size: 1.4rem;
-    }
+#water h2 {
+    font-weight: 600;
+    font-size: 1.5rem;
+}
 
-    img {
-        height: 300px;
-    }
+#water button {
+    background-color: #006aac;
+    color: white;
+    padding: 5px 8px;
+    border: none;
+    border-radius: 10px;
+    margin: 7px;
+    cursor: pointer;
+}
 
-    button {
-        background-color: #006aac;
-        color: white;
-        padding: 5px 8px;
-        border: none;
-        border-radius: 10px;
-        margin: 7px;
-        cursor: pointer;
-    }
+#water h3 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 10px 0px;
+}
 
-    h3 {
-        font-size: 1.1rem;
-        font-weight: 500;
-        margin: 10px 0px;
-    }
+#water ul li {
+    font-size: 0.9rem;
+    list-style-type: none;
+}
 
-    ul li {
-        font-size: 0.9rem;
-        list-style-type: none;
-    }
+#water-progress {
+    display: flex; 
+    flex-direction: row; 
+    justify-content: space-around;
+    align-items: center;
+    padding: 15px 0 0;
+    margin-bottom: 20px;
+}
+
+#visual-progress img {
+    height: 280px; 
+    margin: 0;
+}
+
+#textual-progress {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start; 
+    gap: 15px;
+    width: 40%;
+}
+
+#textual-progress p {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #333;
+}
+
+#textual-progress span {
+    font-weight: 700;
+    color: #006aac;
+    font-size: 1.6rem;
 }
 
 #history-container {
@@ -78,7 +109,7 @@ main {
     padding-left: 45px;
 }
 
-#ml {
+#ml-div {
     display: flex;
     flex-flow: column;
     width: 80%;

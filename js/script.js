@@ -1,3 +1,5 @@
+"use strict"
+
 const waterInput = document.getElementById("water-input");
 const waterBtns = document.getElementById("water-btns");
 const registerBtn = document.getElementById("register-btn");
@@ -12,24 +14,15 @@ const loginUser = document.getElementById("login-user");
 const loginSenha = document.getElementById("login-senha");
 const loginBtn = document.getElementById("login-btn");
 
-const users = [
-    {
-        username: "mateustoledo",
-        password: "1111",
-        idade: 24,
-        peso: 74,
-    },
-    {
-        username: "marinamagalhaes",
-        password: "2222",
-        idade: 23,
-        peso: 62,
-    }
-]
+const totalAguaSpan = document.getElementById("total-agua"); 
+const metaAguaSpan = document.getElementById("meta-agua");
+
+
 
 // Função de verificação do login
 function verificarLogin() {
-
+    if (!loginUser || !loginSenha) return null;
+    
     const usernameInput = loginUser.value.trim();
     const senhaInput = loginSenha.value.trim();
 
@@ -43,7 +36,7 @@ function verificarLogin() {
     )
 
     if (userFound) {
-        alert(`Login bem-sucedido! Bem-vindo(a), ${userFound.username}!`);  
+        window.location.href = 'index.html'; 
         return userFound; 
     } else {
         alert("Usuário ou senha inválidos. Tente novamente.");
@@ -51,20 +44,46 @@ function verificarLogin() {
     }
 }
 
-loginBtn.addEventListener('click', verificarLogin);
+if (loginBtn) {
+    loginBtn.addEventListener('click', verificarLogin);
+}
+
+
+
+
+// Função de cálculo da meta diária
+function calcularMeta(peso) {
+    if (isNaN(peso) || peso <= 0) {
+        return 2000;
+    }
+    const metaMl = peso * 35;
+    return Math.round(metaMl)
+}
+
+// Função auxiliar para verificar se o registro é de hoje
+function isToday(timestamp) {
+    const today = new Date().toDateString();
+    const registerDate = new Date(timestamp).toDateString();
+    return today === registerDate;
+}
+
+
+
+
 
 
 // Função de adição do volume de água ao input através dos botões
 function handleWaterButtons(e) {
-    const target = e.target;
-    
-    if (target.tagName !== 'BUTTON' || target.id === 'register-btn') {
+    if (!waterInput || !waterBtns) return;
+
+    const button = e.target.closest('button'); 
+
+    if (!button || button.id === 'register-btn') {
         return;
     }
 
     const valorAtual = parseInt(waterInput.value) || 0;
-    
-    let volumeString = target.textContent; 
+    let volumeString = button.textContent;
 
     volumeString = volumeString
         .replace('+', '')
@@ -78,13 +97,17 @@ function handleWaterButtons(e) {
     }
 }
 
-waterBtns.addEventListener('click', handleWaterButtons);
+if (waterBtns) {
+    waterBtns.addEventListener('click', handleWaterButtons);
+}
 
 
 let waterHistory = [];
 
 // Função de manipulação do DOM para constar o histórico de ingestão
 function renderWaterHistory() {
+    if (!waterList) return;
+    
     waterList.innerHTML = ''; 
 
     const historicoInvertido = waterHistory.slice().reverse();
@@ -104,7 +127,8 @@ function renderWaterHistory() {
 
 // Função de registro do volume ingerido
 function handleRegisterClick() {
-    
+    if (!waterInput || !registerBtn) return;
+
     const volumeParaRegistrar = parseInt(waterInput.value);
 
     if (isNaN(volumeParaRegistrar) || volumeParaRegistrar <= 0) {
@@ -122,4 +146,6 @@ function handleRegisterClick() {
     waterInput.value = ''; 
 }
 
-registerBtn.addEventListener('click', handleRegisterClick);
+if (registerBtn) { 
+    registerBtn.addEventListener('click', handleRegisterClick);
+}
