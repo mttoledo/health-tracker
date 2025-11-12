@@ -61,6 +61,10 @@ main {
         cursor: pointer;
     }
 
+    button:hover {
+        background-color: #3ED9C7;
+    }
+
     label {
         color: white;
         font-family: "Poppins", sans-serif;
@@ -69,7 +73,7 @@ main {
 }
 
 #criar-conta {
-    margin-top: 20px;
+    font-size: 0.9rem;
 }
 
 .container-cadastro {
