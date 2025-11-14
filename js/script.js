@@ -19,6 +19,8 @@ const metaAguaSpan = document.getElementById("meta-agua");
 
 const logoutBtn = document.getElementById("logout-btn");
 
+const bodyWaterFill = document.getElementById("body-water-fill");
+
 // Definição dos usuários por padrão
 const defaultUsers = [
     { username: "mateustoledo", password: "1111", idade: 24, peso: 74, waterHistory: [] },
@@ -92,6 +94,17 @@ if (loginBtn) {
     loginBtn.addEventListener('click', verificarLogin);
 }
 
+// função botão logout
+function handleLogout() {
+ 
+    localStorage.removeItem('currentUserUsername');
+    window.location.href = 'login.html';
+}
+
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', handleLogout);
+}
+
 // Função de atualização da meta diária e total ingerido
 function updateWaterProgress() {
 
@@ -104,6 +117,15 @@ function updateWaterProgress() {
 
     totalAguaSpan.textContent = `${totalIngerido}ml`;
     metaAguaSpan.textContent = `${meta}ml`;
+
+    // Definição do preenchimento do corpo humano conforme ingestão de água
+    let percentage = (totalIngerido / meta) * 100;
+    if (percentage > 100) {
+        percentage = 100;
+    }
+    
+    const transformValue = 100 - percentage; 
+    bodyWaterFill.style.transform = `translateY(${transformValue}%)`;
 }
 
 // Função de cálculo da meta diária
@@ -214,15 +236,4 @@ if (registerBtn && currentUser) {
     
     renderWaterHistory();
     updateWaterProgress();
-}
-
-// função botão logout
-function handleLogout() {
- 
-    localStorage.removeItem('currentUserUsername');
-    window.location.href = 'login.html';
-}
-
-if (logoutBtn) {
-    logoutBtn.addEventListener('click', handleLogout);
 }

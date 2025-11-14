@@ -15,10 +15,12 @@
     </header>
     <main>
         <div id="water" class="container">
-            <h2>Controle de Água</h2>
+            <h2 class="title-h2">Controle de Água</h2>
             <div id="water-progress">
                 <div id="visual-progress">
-                    <img src="assets/img/corpo-humano.png" alt="">
+                    <div id="body-container-clip"> 
+                        <div id="body-water-fill"></div>
+                    </div>
                 </div>
                 <div id="textual-progress">
                     <p>Total Ingerido: <span id="total-agua">0ml</span></p>
@@ -41,7 +43,24 @@
             </div>
         </div>
         <div id="food" class="container">
-            
+            <h2 class="title-h2">Controle de Calorias</h2>
+            <div id="daily-containers">
+                <div id="daily-food" class="food-container">
+
+                </div>
+                <div id="total-food" class="food-container">
+
+                </div>
+            </div>
+            <input type="text" name="" id="food-search-input" class="food-inputs" placeholder="🔍︎  Buscar Alimento...">
+            <div id="food-suggestions-list">
+
+            </div>
+            <div id="food-number-container">
+                <input type="number" name="" id="food-number-input" class="food-inputs" placeholder="Insira a Quantidade">
+                <button>+</button>
+            </div>
+            <button id="food-register">Registrar Refeição</button>
         </div>
     </main>
     <script src="js/script.js"></script>
