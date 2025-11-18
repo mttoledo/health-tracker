@@ -14,53 +14,64 @@
         <button id="logout-btn">Sair</button>
     </header>
     <main>
-        <div id="water" class="container">
-            <h2 class="title-h2">Controle de Água</h2>
-            <div id="water-progress">
-                <div id="visual-progress">
-                    <div id="body-container-clip"> 
-                        <div id="body-water-fill"></div>
+        <div class="main-container">
+            <div id="water" class="container">
+                <h2 class="title-h2">Controle de Água</h2>
+                <div id="water-progress">
+                    <div id="visual-progress">
+                        <div id="body-container-clip">
+                            <div id="body-water-fill"></div>
+                        </div>
+                    </div>
+                    <div id="textual-progress">
+                        <p>Total Ingerido: <span id="total-agua">0ml</span></p>
+                        <p>Meta Diária: <span id="meta-agua">0ml</span></p>
                     </div>
                 </div>
-                <div id="textual-progress">
-                    <p>Total Ingerido: <span id="total-agua">0ml</span></p>
-                    <p>Meta Diária: <span id="meta-agua">0ml</span></p>
+                <div id="ml-div">
+                    <label for="ml">Volume (ml):</label>
+                    <input type="number" name="ml" id="water-input">
+                </div>
+                <div id="water-btns">
+                    <button>+250ml</button>
+                    <button>+500ml</button>
+                    <button>+1000ml</button>
+                    <button id="register-btn">Registrar Valor</button>
+                </div>
+                <div id="history-container">
+                    <ul id="waterHistoryList">
+                    </ul>
                 </div>
             </div>
-            <div id="ml-div">
-                <label for="ml">Volume (ml):</label>
-                <input type="number" name="ml" id="water-input">
-            </div>
-            <div id="water-btns">
-                <button>+250ml</button>
-                <button>+500ml</button>
-                <button>+1000ml</button>
-                <button id="register-btn">Registrar Valor</button>
-            </div>
-            <div id="history-container">
-                <ul id="waterHistoryList">
-                </ul>
-            </div>
-        </div>
-        <div id="food" class="container">
-            <h2 class="title-h2">Controle de Calorias</h2>
-            <div id="daily-containers">
-                <div id="daily-food" class="food-container">
-
+            <div id="food" class="container">
+                <h2 class="title-h2">Controle de Calorias</h2>
+                <div id="daily-containers">
+                    <div id="daily-food" class="food-container">
+                        <p>Meta Diária</p>
+                        <span>2200 kcal</span>
+                    </div>
+                    <div id="total-food" class="food-container">
+                        <p>Total Consumido</p>
+                        <span>0 kcal</span>
+                    </div>
                 </div>
-                <div id="total-food" class="food-container">
-
+                <div id="progress-box">
+                    <div id="progress-bar"></div>
+                </div>
+                <input type="text" name="" id="food-search-input" class="food-inputs" placeholder="🔍︎  Buscar Alimento...">
+                <div id="food-mid-container">
+                    <div id="food-suggestions-list"></div>
+                    <div id="food-right-box">
+                        <p>Quantidade ingerida em g:</p>
+                        <div id="food-number-container">
+                            <input type="number" name="" id="food-number-input" class="food-inputs" placeholder="0g">
+                            <button>-</button>
+                            <button>+</button>
+                        </div>
+                        <button id="food-register">Registrar Refeição</button>
+                    </div>
                 </div>
             </div>
-            <input type="text" name="" id="food-search-input" class="food-inputs" placeholder="🔍︎  Buscar Alimento...">
-            <div id="food-suggestions-list">
-
-            </div>
-            <div id="food-number-container">
-                <input type="number" name="" id="food-number-input" class="food-inputs" placeholder="Insira a Quantidade">
-                <button>+</button>
-            </div>
-            <button id="food-register">Registrar Refeição</button>
         </div>
     </main>
     <script src="js/script.js"></script>

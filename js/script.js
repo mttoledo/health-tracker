@@ -21,11 +21,28 @@ const logoutBtn = document.getElementById("logout-btn");
 
 const bodyWaterFill = document.getElementById("body-water-fill");
 
+// Declaração de variáveis - Controle de Calorias
+const foodSearchInput = document.getElementById("food-search-input");
+const foodSuggestionsList = document.getElementById("food-suggestions-list");
+const foodNumberInput = document.getElementById("food-number-input");
+const foodRegisterBtn = document.getElementById("food-register");
+const progressBar = document.getElementById("progress-bar");
+
+const totalCaloriesSpan = document.querySelector("#total-food span");
+const metaCaloriesSpan = document.querySelector("#daily-food span");
+
+// Variáveis de Estado para a API Edamam
+const EDAMAM_APP_ID = 'cf345255';
+const EDAMAM_APP_KEY = '4eca1c2c432dc6b40cf9b80bc4b3f250';
+
+let selectedFood = null;
+let searchTimeout = null;
+
 // Definição dos usuários por padrão
 const defaultUsers = [
-    { username: "mateustoledo", password: "1111", idade: 24, peso: 74, waterHistory: [] },
-    { username: "gilmartoledo", password: "3333", idade: 63, peso: 87, waterHistory: [] },
-    { username: "marinamagalhaes", password: "2222", idade: 23, peso: 59, waterHistory: [] }
+    { username: "mateustoledo", password: "1111", idade: 24, peso: 74, altura: 175, genero: "masculino", waterHistory: [], mealHistory: [] },
+    { username: "gilmartoledo", password: "3333", idade: 63, peso: 87, altura: 170, genero: "masculino", waterHistory: [], mealHistory: [] },
+    { username: "marinamagalhaes", password: "2222", idade: 23, peso: 59, altura: 165, genero: "feminino", waterHistory: [], mealHistory: [] }
 ];
 
 // Carrega usuários do Local Storage ou usa os padrões
@@ -198,6 +215,16 @@ function renderWaterHistory() {
         listItem.textContent = `💧 ${registro.volume}ml às ${horaFormatada}`;
         waterList.appendChild(listItem);
     });
+    displayWaterList();
+}
+
+// Função para ocultar a lista do histórico de ingestão de água caso vazio
+function displayWaterList() {
+    if (waterList.children.length === 0) {
+        waterList.style.display = 'none';
+    } else {
+        waterList.style.display = 'block';
+    }
 }
 
 // Função de registro do volume ingerido
@@ -222,6 +249,7 @@ function handleRegisterClick() {
 
     renderWaterHistory();
     updateWaterProgress();
+    displayWaterList();
 
     waterInput.value = ''; 
 }
@@ -236,4 +264,171 @@ if (registerBtn && currentUser) {
     
     renderWaterHistory();
     updateWaterProgress();
+}
+
+// Função de cálculo da taxa metabólica basal seguindo a fórmula de Mifflin-St Jeor
+function calcularTMB() {
+    let tmb;
+
+    if (!currentUser || !currentUser.peso || !currentUser.altura || !currentUser.idade || !currentUser.genero) {
+        console.error("Dados do usuário incompletos para calcular a TMB.");
+        return 0;
+    }
+
+    if (currentUser.genero === "masculino") {
+        tmb = (10 * currentUser.peso) + (6.25 * currentUser.altura) - (5 * currentUser.idade) + 5;
+    } else if (currentUser.genero === "feminino") {
+        tmb = (10 * currentUser.peso) + (6.25 * currentUser.altura) - (5 * currentUser.idade) - 161;
+    } else { 
+        console.warn("Gênero inválido para cálculo da TMB. Usando fórmula masculina como fallback.");
+        tmb = (10 * currentUser.peso) + (6.25 * currentUser.altura) - (5 * currentUser.idade) + 5;
+    }
+
+    return Math.round(tmb);
+}
+
+// Função de atualização do progresso de calorias e da barra de progresso
+function updateCaloriesProgress() {
+    if (!currentUser || !totalCaloriesSpan || !metaCaloriesSpan) return;
+
+    const meta = calcularTMB();
+
+    const todayMeals = getTodayMeals();
+    const totalIngerido = todayMeals.reduce((sum, registro) => sum + registro.calories, 0);
+
+    totalCaloriesSpan.textContent = `${totalIngerido} kcal`;
+    metaCaloriesSpan.textContent = `${meta} kcal`;
+
+    let percentage = (totalIngerido / meta) * 100;
+
+    if (percentage > 100) {
+        percentage = 100;
+    }
+
+    if (progressBar) {
+        progressBar.style.width = `${percentage}%`;
+    }
+}
+
+// Função de busca de alimentos na API Edaman
+async function searchFood(query) {
+    if (query.length < 3) {
+        foodSuggestionsList.innerHTML = '';
+        selectedFood = null;
+        return;
+    }
+
+    const url = `https://api.edamam.com/api/food-database/v2/parser?ingr=${query}&app_id=${EDAMAM_APP_ID}&app_key=${EDAMAM_APP_KEY}`;
+
+   try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        displayFoodSuggestions(data.hints);
+    } catch (error) {
+        console.error("Erro ao buscar alimentos na API Edamam:", error);
+        
+        
+        foodSuggestionsList.innerHTML = '<li class="suggestion-item">Erro ao buscar. Tente novamente.</li>';
+        foodSuggestionsList.style.display = 'block';
+    }
+}
+
+// Função para exibir as sugestões da API
+function displayFoodSuggestions(hints) {
+    foodSuggestionsList.innerHTML = '';
+
+    if (!hints || hints.length === 0) {
+        const listItem = document.createElement('li');
+        listItem.textContent = 'Nenhum alimento encontrado.';
+        foodSuggestionsList.appendChild(listItem);
+        return;
+    }
+
+    hints.forEach(hint => {
+        const food = hint.food;
+        const listItem = document.createElement('li');
+        listItem.textContent = food.label;
+        listItem.className = 'suggestion-item';
+        
+        listItem.dataset.foodId = food.foodId;
+        listItem.dataset.foodName = food.label;
+        listItem.dataset.caloriesPer100g = food.nutrients ? (food.nutrients.ENERC_KCAL || 0) : 0;
+        
+        listItem.addEventListener('click', () => selectFoodSuggestion(food));
+        foodSuggestionsList.appendChild(listItem);
+    });
+}
+
+// Função para selecionar um alimento da lista de sugestões
+function selectFoodSuggestion(food) {
+    selectedFood = {
+        id: food.foodId,
+        name: food.label,
+        caloriesPer100g: food.nutrients ? (food.nutrients.ENERC_KCAL || 0) : 0
+    };
+    foodSearchInput.value = food.label;
+    foodSuggestionsList.innerHTML = '';
+    foodNumberInput.focus();
+}
+
+// Função auxiliar para filtrar o registro de refeições diário
+function getTodayMeals() {
+    if (!currentUser) return [];
+    
+    return currentUser.mealHistory.filter(registro => isToday(registro.timestamp));
+}
+
+// Função para registrar a refeição
+function handleRegisterMealClick() {
+    if (!currentUser || !foodNumberInput || !foodRegisterBtn) return;
+    if (!selectedFood) {
+        alert("Por favor, busque e selecione um alimento da lista de sugestões antes de registrar.");
+        return;
+    }
+
+    const quantity = parseInt(foodNumberInput.value);
+    if (isNaN(quantity) || quantity <= 0) {
+        alert("Por favor, insira uma quantidade válida para a refeição.");
+        return;
+    }
+
+    const calculatedCalories = (selectedFood.caloriesPer100g / 100) * quantity;
+
+    const novoRegistro = {
+        mealName: selectedFood.name,
+        calories: Math.round(calculatedCalories),
+        quantity: quantity,
+        unit: 'g',
+        timestamp: Date.now()
+    };
+    
+    currentUser.mealHistory.push(novoRegistro); 
+    saveUsers(users); 
+
+    updateCaloriesProgress();
+
+    foodSearchInput.value = '';
+    foodNumberInput.value = '';
+    selectedFood = null;
+}
+
+// Inicialização das funções do módulo de calorias
+if (currentUser) {
+
+    foodSearchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout); 
+        searchTimeout = setTimeout(() => {
+            searchFood(e.target.value); 
+        }, 1500);
+    });
+
+    if (foodRegisterBtn) {
+        foodRegisterBtn.addEventListener('click', handleRegisterMealClick);
+    }
+    
+    // renderMealHistory(); // <--- NÃO VAMOS RENDERIZAR O HISTÓRICO POR ENQUANTO
+    updateCaloriesProgress();
 }
